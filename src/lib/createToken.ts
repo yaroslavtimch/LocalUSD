@@ -2,7 +2,6 @@ import {
     Connection,
     clusterApiUrl,
     Keypair,
-    PublicKey,
     SystemProgram,
     Transaction,
   } from '@solana/web3.js';
@@ -13,7 +12,6 @@ import {
     createInitializeMintInstruction,
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
-    mintTo,
     createMintToInstruction,
   } from '@solana/spl-token';
   
