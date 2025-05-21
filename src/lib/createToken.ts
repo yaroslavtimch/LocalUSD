@@ -2,7 +2,6 @@ import {
     Connection,
     clusterApiUrl,
     Keypair,
-    PublicKey,
     SystemProgram,
     Transaction,
   } from '@solana/web3.js';
@@ -13,11 +12,15 @@ import {
     createInitializeMintInstruction,
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
-    mintTo,
     createMintToInstruction,
   } from '@solana/spl-token';
   
-  export default async function createToken(decimals: number, amount: number): Promise<string> {
+  export default async function createToken(
+    decimals: number, 
+    amount: number,
+    name: string,
+    symbol: string,
+  ): Promise<string> {
     const provider = (window as any).solana;
     if (!provider?.isPhantom) {
       throw new Error('Phantom wallet not found');
@@ -80,17 +83,30 @@ import {
         ata,
         wallet, 
         amount * Math.pow(10, decimals)
-      );
+    );
   
-      const mintTx = new Transaction().add(mintIx);
-      mintTx.feePayer = wallet;
-      mintTx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-      
-      const signedMintTx = await provider.signTransaction(mintTx);
-      const mintTxId = await connection.sendRawTransaction(signedMintTx.serialize());
-      await connection.confirmTransaction(mintTxId, 'confirmed');
-      
-      console.log('Tokens minted! Tx ID:', mintTxId);
+    const mintTx = new Transaction().add(mintIx);
+    mintTx.feePayer = wallet;
+    mintTx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+    
+    const signedMintTx = await provider.signTransaction(mintTx);
+    const mintTxId = await connection.sendRawTransaction(signedMintTx.serialize());
+    await connection.confirmTransaction(mintTxId, 'confirmed');
+    
+    console.log('Tokens minted! Tx ID:', mintTxId);
+
+    await fetch('/api/saveCreatedToken', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        walletAddress: wallet.toBase58(),
+        mintAddress: mintPubkey.toBase58(),
+        tokenName: name,
+        symbol,
+        amount,
+        decimals,
+      }),
+    });
       
     return mintPubkey.toBase58();
   }
