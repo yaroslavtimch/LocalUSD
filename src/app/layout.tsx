@@ -4,6 +4,7 @@ import { SolanaProvider } from "@/components/SolanaProvider/SolanaProvider";
 import Link from "next/link";
 import WalletConnection from "@/components/WalletConnection/WalletConnection";
 
+
 export const metadata: Metadata = {
   title: 'Locura',
   description: 'Create local stablecoins for your DAO or community',
