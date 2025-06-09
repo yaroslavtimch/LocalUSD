@@ -1,21 +1,19 @@
-'use client'
+'use client';
 
-import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
-import { Connection } from '@solana/web3.js';
-import { getMyCreatedTokens } from '@/lib/getCreatedTokens';
-
-const connection = new Connection('https://api.devnet.solana.com');
+import { useWallet } from '@solana/wallet-adapter-react';
 
 type Token = {
   mint_address: string;
+  wallet_address: string,
+  token_name: string,
+  symbol: string,
+  amount: number,
   created_at: string;
 };
 
 export default function ProfilePage() {
-  const { publicKey, disconnect } = useWallet();
-  const [balance, setBalance] = useState<number | null>(null);
-  const [joinedDAOs, setJoinedDAOs] = useState<string[]>([]); // моковые DAO
+  const { publicKey } = useWallet();
   const [tokens, setTokens] = useState<Token[]>([]);
 
   useEffect(() => {
@@ -25,79 +23,38 @@ export default function ProfilePage() {
       .then(setTokens);
   }, [publicKey]);
 
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (publicKey) {
-        const lamports = await connection.getBalance(publicKey);
-        setBalance(lamports / 1_000_000_000); // перевели в SOL
-      }
-    };
-
-    fetchBalance();
-
-    // Моковые DAO
-    setJoinedDAOs([
-      'Kyiv Builders DAO',
-      'Locura Test DAO',
-      'ETH DAO Lviv'
-    ]);
-  }, [publicKey]);
-
-  if (!publicKey) {
-    return (
-      <div className="p-6 text-center text-gray-700">
-        <h2 className="text-xl font-bold mb-2">👤 Профиль</h2>
-        <p>Подключите кошелёк, чтобы увидеть профиль.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-4">
-      <h1 className="text-2xl font-bold">👤 Мой профиль</h1>
-
-      <div className="bg-white/5 p-4 rounded-xl border border-white/10 shadow">
-        <h2 className="text-lg font-semibold mb-1">💼 Адрес:</h2>
-        <p className="text-sm text-gray-300">{publicKey.toBase58()}</p>
-      </div>
-
-      <div className="bg-white/5 p-4 rounded-xl border border-white/10 shadow">
-        <h2 className="text-lg font-semibold mb-1">💰 Баланс:</h2>
-        <p>{balance !== null ? `${balance.toFixed(3)} SOL` : 'Загрузка...'}</p>
-      </div>
-
-      <div className="bg-white/5 p-4 rounded-xl border border-white/10 shadow">
-        <h1 className="text-2xl font-bold mb-4">Мои созданные токены</h1>
-        {tokens.length === 0 ? (
-          <p>Пока ничего нет</p>
-        ) : (
-          <ul className="space-y-2">
-            {tokens.map((t) => (
-              <li key={t.mint_address} className="border p-3 rounded">
-                <div>Mint: {t.mint_address}</div>
-                <div className="text-sm text-gray-500">Создан: {new Date(t.created_at).toLocaleString()}</div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="bg-white/5 p-4 rounded-xl border border-white/10 shadow">
-        <h2 className="text-lg font-semibold mb-2">🏛 DAO-участие:</h2>
-        <ul className="list-disc pl-5 space-y-1 text-gray-200">
-          {joinedDAOs.map((dao, index) => (
-            <li key={index}>{dao}</li>
+    <div className="p-6 max-w-3xl mx-auto bg-gray-900 rounded-lg shadow-lg text-gray-100">
+      <h1 className="text-3xl font-extrabold mb-6 text-green-400">My Created Tokens</h1>
+      {tokens.length === 0 ? (
+        <p className="text-gray-400 italic">Nothing here yet</p>
+      ) : (
+        <ul className="space-y-4">
+          {tokens.map((t) => (
+            <li
+              key={t.mint_address}
+              className="border border-gray-700 p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-lg text-green-300">{t.token_name || 'Unnamed'}</span>
+                <span className="text-sm px-2 py-1 bg-green-700 rounded-md">{t.symbol || '???'}</span>
+              </div>
+              <div className="text-sm mb-1">
+                <strong>Mint Address:</strong> <code className="break-all">{t.mint_address}</code>
+              </div>
+              <div className="text-sm mb-1">
+                <strong>Owner:</strong> <code className="break-all">{t.wallet_address}</code>
+              </div>
+              <div className="text-sm mb-1">
+                <strong>Amount:</strong> {t.amount?.toLocaleString() || '–'}
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                Created: {new Date(t.created_at).toLocaleString()}
+              </div>
+            </li>
           ))}
         </ul>
-      </div>
-
-      <button
-        onClick={disconnect}
-        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
-      >
-        🔌 Отключить кошелёк
-      </button>
+      )}
     </div>
   );
 }

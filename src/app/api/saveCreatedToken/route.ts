@@ -1,22 +1,49 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // для записи
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+if (!supabaseUrl || !serviceRoleKey) {
+  throw new Error("Missing Supabase env variables");
+}
+
+const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 export async function POST(req: NextRequest) {
-  const { walletAddress, mintAddress } = await req.json();
+  try {
+    const body = await req.json();
+    const { 
+      walletAddress, 
+      mintAddress, 
+      tokenName,
+      symbol,
+      amount,
+      decimals
+    } = body;
 
-  const { error } = await supabase.from('created_tokens').insert({
-    wallet_address: walletAddress,
-    mint_address: mintAddress
-  });
+    if (!walletAddress || !mintAddress) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const { error } = await supabase.from('created_tokens').insert({
+      wallet_address: walletAddress,
+      mint_address: mintAddress,
+      token_name: tokenName,
+      symbol,
+      amount,
+      decimals,
+      created_at: new Date(),
+    });
+
+    if (error) {
+      console.error("Supabase Insert Error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    console.error("Unexpected error:", e);
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true });
 }

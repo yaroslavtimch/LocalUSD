@@ -16,16 +16,8 @@ export default function TokenBuider() {
     setLoading(true);
 
     try {
-      const address = await createToken(decimals, amount);
+      const address = await createToken(decimals, amount, tokenName, symbol);
       setTokenAddress(address);
-      await fetch('/api/saveCreatedToken', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        walletAddress: wallet.toBase58(),
-        mintAddress: mintPubkey.toBase58(),
-      }),
-});
     } catch (err) {
       console.error('Error creating token:', err);
       alert('Token creation failed. See console for details.');
