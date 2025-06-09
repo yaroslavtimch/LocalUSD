@@ -13,25 +13,6 @@
 - Wallet integration via `@solana/wallet-adapter`
 - Metadata and token indexing via **Supabase**
 
-
----
-
-## Stack
-
-| Layer          | Tech                                                                    |
-|----------------|-------------------------------------------------------------------------|
-| Frontend       | [Next.js 15](https://nextjs.org/), TailwindCSS, App Router              |
-| Blockchain     | [Solana Web3.js](https://solana.com/), SPL Token                        |
-| Wallets        | [@solana/wallet-adapter](https://github.com/solana-labs/wallet-adapter) |
-| Storage / Index| [Supabase](https://supabase.io/) (for indexing created tokens)          |
-
-
----
-
-## Installation
-
-=======
-
 ---
 
 ## Stack
@@ -79,7 +60,6 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 ####  );
 
 ## Installation
-
 
 ```bash
 git clone https://github.com/yaroslavtimch/LocalUSD.git
