@@ -31,6 +31,9 @@ export default function RootLayout({
                 <Link href="/me" className="hover:text-green-400 transition">
                   My Tokens
                 </Link>
+                <Link href="/send" className="hover:text-green-400 transition">
+                  Send Tokens
+                </Link>
                 <WalletConnection />
               </nav>
             </div>
