@@ -15,6 +15,15 @@
 
 ---
 
+## Demo
+
+Try out the live demo of **Locura** here:  
+[https://local-usd.vercel.app/](https://local-usd.vercel.app/)
+
+Experience the no-code token creation, manage your stablecoins, and explore the platform's features directly in your browser!
+
+---
+
 ## Stack
 
 | Layer          | Tech                                                                    |
